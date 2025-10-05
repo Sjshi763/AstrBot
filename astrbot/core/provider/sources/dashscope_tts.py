@@ -21,7 +21,9 @@ class ProviderDashscopeTTSAPI(TTSProvider):
         super().__init__(provider_config, provider_settings)
         self.chosen_api_key: str = provider_config.get("api_key", "")
         self.voice: str = provider_config.get("dashscope_tts_voice", "loongstella")
-        self.set_model(provider_config.get("model", None))
+        # 直接使用用户配置的模型值
+        model = provider_config.get("model", None)
+        self.set_model(model)
         self.timeout_ms = float(provider_config.get("timeout", 20)) * 1000
         dashscope.api_key = self.chosen_api_key
 
@@ -36,6 +38,9 @@ class ProviderDashscopeTTSAPI(TTSProvider):
         audio = await asyncio.get_event_loop().run_in_executor(
             None, self.synthesizer.call, text, self.timeout_ms
         )
+        if audio is None:
+            model_name = self.get_model()
+            raise Exception(f"Failed to synthesize speech with model '{model_name}': audio data is None. Please check your API key, model name, and network connection.")
         with open(path, "wb") as f:
             f.write(audio)
         return path

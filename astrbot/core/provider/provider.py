@@ -27,9 +27,9 @@ class AbstractProvider(abc.ABC):
         self.model_name = ""
         self.provider_config = provider_config
 
-    def set_model(self, model_name: str):
+    def set_model(self, model_name: str | None):
         """设置当前使用的模型名称"""
-        self.model_name = model_name
+        self.model_name = model_name if model_name is not None else ""
 
     def get_model(self) -> str:
         """获得当前使用的模型名称"""
